@@ -1,7 +1,33 @@
+<?php
+//error_reporting(E_ALL);ini_set('display_errors',1);
+//const_dump($_POST);
+require_once('php/classes/Studenti.php');
+
+$student = new Student();
+
+if (isset($_POST['create'])) {
+    $student->create($_POST['ime'], $_POST['prezime'], $_POST['email'], $_POST['telefon']);
+    header('Location: index.php');
+}
+
+if (isset($_POST['update'])) {
+
+    $student->update($_POST['ime'], $_POST['prezime'], $_POST['email'], $_POST['telefon'], $_POST['id']);
+    header('Location: index.php');
+}
+
+if (isset($_POST['delete'])) {
+    $student->delete($_POST['id']);
+    header('Location: index.php');
+}
+
+$studenti = $student->read();
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -88,7 +114,7 @@
             <table class="table table-striped table-bordered" id="studentiTable">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
+<!--                    <th scope="col">#</th>-->
                     <th scope="col" data-sort="id">Id</th>
                     <th scope="col" data-sort="ime">Ime</th>
                     <th scope="col" data-sort="prezime">Prezime</th>
@@ -98,8 +124,30 @@
                 </tr>
                 </thead>
                 <tbody id="table-body">
-                <!-- Redovi u taabeli -->
+                <!-- Redovi u tabeli -->
+                <?php foreach ($studenti as $student) : ?>
+                    <tr>
+<!--                        <th scope="row">1</th>-->
+                        <td data-column="id"><?= $student['id'] ?></td>
+                        <td data-column="ime"><?= $student['ime'] ?></td>
+                        <td data-column="prezime"><?= $student['prezime'] ?></td>
+                        <td data-column="email"><?= $student['email'] ?></td>
+                        <td data-column="telefon"><?= $student['telefon'] ?></td>
+                        <td>
 
+                            <button class="btn btn-primary btn-sm edit-btn" data-toggle="modal" data-target="#editModal"
+                                    data-id="<?php echo $student['id']; ?>"
+                                    data-ime="<?php echo $student['ime']; ?>"
+                                    data-prezime="<?php echo $student['prezime']; ?>"
+                                    data-email="<?php echo $student['email']; ?>"
+                                    data-telefon="<?php echo $student['telefon']; ?>">Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-toggle="modal"
+                                    data-target="#deleteModal" data-id="<?php echo $student['id']; ?>">Delete
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
 
                 </tbody>
             </table>
@@ -107,7 +155,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Add Modal -->
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
@@ -226,14 +273,96 @@
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
         crossorigin="anonymous"></script>
 <script>
-    // Select all the rows in the table
-    const rows = document.querySelectorAll('table tbody tr');
 
-    // Get the number of rows and update the rowCount element
+    const rows = document.querySelectorAll('table tbody tr');
     document.getElementById('rowCount').innerHTML = rows.length;
+
 </script>
 
+<script>
+    $(document).on("click", ".edit-btn", function () {
 
+        const id = $(this).data('id');
+        const ime = $(this).data('ime');
+        const prezime = $(this).data('prezime');
+        const email = $(this).data('email');
+        const telefon = $(this).data('telefon');
+        $("#editModal #id").val(id);
+        $("#editModal #ime").val(ime);
+        $("#editModal #prezime").val(prezime);
+        $("#editModal #email").val(email);
+        $("#editModal #telefon").val(telefon);
+    });
+
+    $(document).on("click", ".delete-btn", function () {
+        const id = $(this).data('id');
+        $("#deleteModal #id").val(id);
+    });
+</script>
+
+<script>
+    function searchTable() {
+
+        let input = document.getElementById("searchInput");
+        let searchBtn = document.getElementById("search-btn");
+
+
+        let table = document.getElementById("table-body");
+        let rows = table.getElementsByTagName("tr");
+
+
+        let searchValue = input.value.toLowerCase().trim();
+
+
+        for (let i = 0; i < rows.length; i++) {
+            let ime = rows[i].getElementsByTagName("td")[1].textContent.toLowerCase();
+            let prezime = rows[i].getElementsByTagName("td")[2].textContent.toLowerCase();
+            let email = rows[i].getElementsByTagName("td")[3].textContent.toLowerCase();
+            let telefon = rows[i].getElementsByTagName("td")[4].textContent.toLowerCase();
+            if (ime.includes(searchValue) || prezime.includes(searchValue) || email.includes(searchValue) || telefon.includes(searchValue)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+
+    let searchBtn = document.getElementById("search-btn");
+    searchBtn.addEventListener("click", searchTable);
+
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        $('th[data-sort]').on('click', function () {
+            let column = $(this).data('sort');
+            let table = $(this).closest('table');
+            let tbody = table.find('tbody');
+            let rows = tbody.find('tr').get();
+            let ascending = $(this).hasClass('asc');
+            rows.sort(function (a, b) {
+                let aValue = $(a).find('td[data-column="' + column + '"]').text().toLowerCase();
+                let bValue = $(b).find('td[data-column="' + column + '"]').text().toLowerCase();
+                if (aValue < bValue) {
+                    return ascending ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return ascending ? 1 : -1;
+                }
+                return 0;
+            });
+            tbody.empty();
+            $.each(rows, function (index, row) {
+                tbody.append(row);
+            });
+            $(this).toggleClass('asc', !ascending);
+            $(this).toggleClass('desc', ascending);
+        });
+    });
+
+
+</script>
 </body>
 </html>
 
