@@ -75,37 +75,35 @@ $studenti = $student->read();
         </ul>
         <!-- Pretraga -->
         <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="searchInput">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="search-btn">Search</button>
+            <input class="form-control mr-sm-2" type="search" placeholder="Pretraga" aria-label="Search" id="searchInput">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="search-btn">Pretraži</button>
             <!-- Podaci o korisniku -->
             <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    User Name
+                    Bojana Modrić
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Profile</a>
-                    <a class="dropdown-item" href="#">Settings</a>
+                    <a class="dropdown-item" href="#">Profil</a>
+                    <a class="dropdown-item" href="#">Podešavanja</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Sign Out</a>
+                    <a class="dropdown-item" href="#">Odjava</a>
                 </div>
             </div>
         </form>
     </div>
 </nav>
-
-
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">
             <!-- Dugme za dodavanje zapisa -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Dodaj studenta
                 </button>
 
                 <!-- Broj redova u tabeli -->
                 <div class="text-right mt-3">
-                    <span>Rows:</span>
+                    <span>Broj zapisa:</span>
                     <span id="rowCount" class="badge badge-secondary">0</span>
                 </div>
             </div>
@@ -140,10 +138,10 @@ $studenti = $student->read();
                                     data-ime="<?php echo $student['ime']; ?>"
                                     data-prezime="<?php echo $student['prezime']; ?>"
                                     data-email="<?php echo $student['email']; ?>"
-                                    data-telefon="<?php echo $student['telefon']; ?>">Edit
+                                    data-telefon="<?php echo $student['telefon']; ?>">Uredi
                             </button>
                             <button class="btn btn-danger btn-sm delete-btn" data-toggle="modal"
-                                    data-target="#deleteModal" data-id="<?php echo $student['id']; ?>">Delete
+                                    data-target="#deleteModal" data-id="<?php echo $student['id']; ?>">Obriši
                             </button>
                         </td>
                     </tr>
@@ -180,12 +178,12 @@ $studenti = $student->read();
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Unesite prezime"
+                        <input type="email" class="form-control" id="email" placeholder="Unesite email"
                                name="email">
                     </div>
                     <div class="form-group">
                         <label for="telefon">Telefon</label>
-                        <input type="text" class="form-control" id="telefon" placeholder="Unesite prezime"
+                        <input type="text" class="form-control" id="telefon" placeholder="Unesite telefon"
                                name="telefon">
                     </div>
                     <div class="modal-footer">
@@ -306,27 +304,24 @@ $studenti = $student->read();
         let input = document.getElementById("searchInput");
         let searchBtn = document.getElementById("search-btn");
 
-
         let table = document.getElementById("table-body");
         let rows = table.getElementsByTagName("tr");
 
-
         let searchValue = input.value.toLowerCase().trim();
 
-
         for (let i = 0; i < rows.length; i++) {
+            let id = rows[i].getElementsByTagName("td")[0].textContent.toLowerCase();
             let ime = rows[i].getElementsByTagName("td")[1].textContent.toLowerCase();
             let prezime = rows[i].getElementsByTagName("td")[2].textContent.toLowerCase();
             let email = rows[i].getElementsByTagName("td")[3].textContent.toLowerCase();
             let telefon = rows[i].getElementsByTagName("td")[4].textContent.toLowerCase();
-            if (ime.includes(searchValue) || prezime.includes(searchValue) || email.includes(searchValue) || telefon.includes(searchValue)) {
+            if (ime.includes(searchValue) || prezime.includes(searchValue) || email.includes(searchValue) || telefon.includes(searchValue) || id.includes(searchValue)) {
                 rows[i].style.display = "";
             } else {
                 rows[i].style.display = "none";
             }
         }
     }
-
     let searchBtn = document.getElementById("search-btn");
     searchBtn.addEventListener("click", searchTable);
 
@@ -360,7 +355,6 @@ $studenti = $student->read();
             $(this).toggleClass('desc', ascending);
         });
     });
-
 
 </script>
 </body>
